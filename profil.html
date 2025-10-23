@@ -133,9 +133,9 @@
 document.addEventListener("DOMContentLoaded", ()=>{
   const API="http://localhost:3001"
   const uStr = localStorage.getItem("user")
-  if (!uStr) { location.href = "connexion.html"; return }
+  if (!uStr) { location.href = "index.html"; return }
   let user = {}
-  try { user = JSON.parse(uStr) } catch(e) { localStorage.removeItem("user"); location.href="connexion.html"; return }
+  try { user = JSON.parse(uStr) } catch(e) { localStorage.removeItem("user"); location.href="index.html"; return }
 
   const f = document.getElementById("form-profil")
   const s = document.getElementById("profil-status")
@@ -208,7 +208,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
       if (!r.ok || !j.ok) throw 0
       localStorage.removeItem("user")
       localStorage.removeItem("user_id")
-      location.href = "connexion.html"
+      location.href = "index.html"
     }catch(e){
       alert("Erreur")
     }
@@ -217,7 +217,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   if (btnLogout) btnLogout.addEventListener("click", ()=>{
     localStorage.removeItem("user")
     localStorage.removeItem("user_id")
-    location.href = "connexion.html"
+    location.href = "index.html"
   })
 
   function ouvrirFenetre(t, txt){
