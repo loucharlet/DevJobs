@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DevJobs • Candidatures reçues</title>
+  <link rel="stylesheet" href="/style/entreprise.css" />
+</head>
+<body>
+
+   <nav class="top-nav">
+  <a href="entreprise1.html">Poster une offre</a>
+  <a href="entreprise2.html" class="actif">Consulter les candidatures reçues</a>
+  </nav>
+
+  <nav class="nav-bar">
+    <div class="brand">
+      <img src="/img/LogoDevJobs.png" alt="DevJobs" />
+    </div>
+
+      <a class="menu-link" href="candidat.html">
+        <img class="icone" src="/img/annonces.png" alt="" />
+        <span>Annonces</span>
+      </a>
+      <a class="menu-link actif" href="entreprise1.html">
+        <img class="icone" src="/img/entreprises.png" alt="" />
+        <span>Entreprises</span>
+      </a>
+      <a class="menu-link" href="profil.html">
+        <img class="icone" src="/img/profil.png" alt="" /> <span>Profil</span>
+      </a>
+
+  </nav>
+
+  <main class="contenu">
+    <header class="en-tete">
+      <h1 class="titre-page">Candidatures reçues</h1>
+    </header>
+
+
+    <section class="liste-candidatures">
+
+     <div id="zone-candidatures">
+  <input id="company-id" placeholder="Company ID">
+  <button id="btn-charger">Charger</button>
+  <table id="candidatures-table" border="1" cellpadding="6" style="margin-top:10px; width:100%;">
+    <thead>
+      <tr><th>ID</th><th>Nom</th><th>Email</th></tr>
+    </thead>
+    <tbody id="candidatures-rows"></tbody>
+  </table>
+</div>
+
+    </section>
+
+  </main>
+
+
+  <div class="voile" id="voile"></div>
+  <div class="fenetre" id="fenetre">
+    <header class="fenetre-header">
+      <h3 id="fenetre-titre"></h3>
+      <button class="fermer" id="btn-fermer" aria-label="Fermer">✕</button>
+    </header>
+    <p id="fenetre-texte"></p>
+  </div>
+  <div id="applications-list">Chargement…</div>
+
+
+  <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const API="http://localhost:3001";
+  const input=document.getElementById("company-id");
+  const btn=document.getElementById("btn-charger");
+  const tbody=document.getElementById("candidatures-rows");
+
+  async function charger(id){
+    try{
+      const r=await fetch(API+"/api/applications?recruiter="+encodeURIComponent(id));
+      const j=await r.json();
+      if(!j.ok) throw 0;
+      tbody.innerHTML="";
+      (j.data||[]).forEach(x=>{
+        const tr=document.createElement("tr");
+        const nom=((x.firstname||"")+" "+(x.lastname||"")).trim();
+        tr.innerHTML = `
+  <td>${x.application_id ?? ""}</td>
+  <td>${nom}</td>
+  <td>${x.email || ""}</td>
+`;
+tbody.appendChild(tr);
+      });
+      if(!j.data||!j.data.length) tbody.innerHTML="<tr><td colspan='5'>Aucune candidature</td></tr>";
+    }catch(e){
+      tbody.innerHTML="<tr><td colspan='5'>Erreur de chargement</td></tr>";
+    }
+  }
+
+  function go(){
+    const id=(input?.value||"").trim();
+    if(!id) return alert("Entre un Company ID");
+    charger(id);
+  }
+
+  if(btn) btn.addEventListener("click", go);
+});
+</script>
+
+                                                                                          
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

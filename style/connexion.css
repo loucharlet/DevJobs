@@ -1,0 +1,134 @@
+:root {
+  --background: #aaeaea;
+  --background2: #d4f5ff;
+  --degrade: #d7bbfe;
+  --degrade2: #f7b6fc;
+  --bouton: #8b3dff;
+  --text: #6c5699;
+  --fond: #ffffff;
+  --ombrebord: #2bb7b7;
+}
+ 
+body {
+  min-height: 100vh;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: var(--text);
+  background-color: var(--fond);
+  background-image:
+    radial-gradient(circle at top left, var(--background), var(--fond), transparent 90%),
+    radial-gradient(circle at bottom right, var(--degrade), transparent 90%),
+    radial-gradient(circle at bottom, var(--background2), transparent 90%);
+  box-shadow: inset 0 0 20px var(--ombrebord);
+ 
+  display: grid;
+  place-items: center;
+}
+ 
+.container {
+  width: 100%;
+  display: grid;
+  place-items: center;
+}
+ 
+.form--unhidden {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+ 
+  width: 420px;
+  padding: 24px;
+  border-radius: 16px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+ 
+.logo-box {
+  width: 40%;
+  height: 40%;
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+ 
+.logo-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+ 
+.form--hidden {
+  display: none;
+}
+ 
+ 
+label,
+input {
+  display: block;
+}
+ 
+input {
+  border-radius: 5px;
+  border: 1px solid var(--degrade);
+  margin-top: 3px;
+  margin-bottom: 3px;
+  padding: 4px;
+}
+ 
+a.form__link {
+  text-decoration: none;
+  transition: 0.5s;
+}
+ 
+button {
+  margin-top: 5px;
+  padding: 4px 8px;
+  border-radius: 3px;
+  border: 1px solid transparent;
+  background-color: var(--bouton);
+  color: var(--fond);
+  cursor: pointer;
+  display: inline-block;
+  outline-style: none;
+  outline-width: 0px;
+  overflow-wrap: break-word;
+  position: relative;
+  text-align: center;
+}
+ 
+a.form__link:hover {
+  color: var(--button);
+}
+ 
+ 
+.form-remember {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  width: 100%;
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--text);
+}
+ 
+.form-remember input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--bouton);
+  transform: scale(1.1);
+}
+ 
+ 
+.form-remember label {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+ 
+.form-remember label:hover {
+  color: var(--degrade2);
+}

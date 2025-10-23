@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Connexion — DevJobs</title>
+    <link rel="stylesheet" href="/style/connexion.css" />
+  </head>
+ <body>
+  <div class="container">
+    <form id="form-login" class="form--unhidden" autocomplete="on">
+      <div class="logo-box"><img src="/img/LogoDevJobs.png" alt="DevJobs" /></div>
+      <div class="form-inputs">
+        <label for="login-email">Email</label>
+        <input id="login-email" name="email" type="email" required />
+      </div>
+      <div class="form-inputs">
+        <label for="login-pass">Mot de passe</label>
+        <input id="login-pass" name="password" type="password" required />
+      </div>
+      <div class="form-inputs"><button type="submit" id="btn-login">Se connecter</button></div>
+      <p id="login-status"></p>
+      <p class="form__text"><a href="#" id="link-to-register" class="form__link">Créer un compte</a></p>
+    </form>
+
+    <form id="form-register" class="form--hidden" autocomplete="on">
+      <div class="logo-box"><img src="/img/LogoDevJobs.png" alt="DevJobs" /></div>
+      <div class="form-inputs"><label for="reg-firstname">Prénom</label><input id="reg-firstname" name="firstname" type="text" /></div>
+      <div class="form-inputs"><label for="reg-lastname">Nom</label><input id="reg-lastname" name="lastname" type="text" /></div>
+      <div class="form-inputs"><label for="reg-email">Email</label><input id="reg-email" name="email" type="email" required /></div>
+      <div class="form-inputs"><label for="reg-pass">Mot de passe</label><input id="reg-pass" name="password" type="password" required /></div>
+      <div class="form-inputs"><label for="reg-phone">Téléphone</label><input id="reg-phone" name="phone" type="text" /></div>
+      <div class="form-inputs"><label for="reg-adress">Adresse</label><input id="reg-adress" name="adress" type="text" /></div>
+      <div class="form-inputs"><label for="reg-zipcode">Code postal</label><input id="reg-zipcode" name="zipcode" type="text" /></div>
+      <div class="form-inputs"><label for="reg-country">Pays</label><input id="reg-country" name="country" type="text" /></div>
+      <div class="form-inputs"><label for="reg-ville">Ville</label><input id="reg-ville" name="Ville" type="text" /></div>
+      <div class="form-inputs"><button type="submit" id="btn-register">Créer un compte</button></div>
+      <p id="register-status"></p>
+      <p class="form__text"><a href="#" id="link-to-login" class="form__link">Se connecter</a></p>
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", ()=>{
+      const API = "http://localhost:3001"
+      const fLogin = document.getElementById("form-login")
+      const fReg = document.getElementById("form-register")
+      const sLogin = document.getElementById("login-status")
+      const sReg = document.getElementById("register-status")
+      const toReg = document.getElementById("link-to-register")
+      const toLogin = document.getElementById("link-to-login")
+
+      function showLogin(){ fLogin.classList.remove("form--hidden"); fReg.classList.add("form--hidden") }
+      function showRegister(){ fReg.classList.remove("form--hidden"); fLogin.classList.add("form--hidden") }
+      function saveUser(u){ localStorage.setItem("user", JSON.stringify(u)); localStorage.setItem("user_id", String(u.user_id)) }
+
+      if (toReg) toReg.addEventListener("click", (e)=>{ e.preventDefault(); showRegister() })
+      if (toLogin) toLogin.addEventListener("click", (e)=>{ e.preventDefault(); showLogin() })
+
+      if (fLogin) fLogin.addEventListener("submit", async (e)=>{
+        e.preventDefault()
+        const fd = new FormData(fLogin)
+        const email = String(fd.get("email")||"").trim()
+        const password = String(fd.get("password")||"").trim()
+        sLogin.textContent = "..."
+        try{
+          const r = await fetch(API+"/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password})})
+          const j = await r.json().catch(()=>({}))
+          if (!r.ok || !j.ok) { sLogin.textContent = j.error || r.statusText; return }
+          saveUser(j.user)
+          location.href = "profil.html"
+        }catch(e){ sLogin.textContent = "Erreur réseau" }
+      })
+
+      if (fReg) fReg.addEventListener("submit", async (e)=>{
+        e.preventDefault()
+        const fd = new FormData(fReg)
+        const body = {
+          firstname: String(fd.get("firstname")||"").trim(),
+          lastname:  String(fd.get("lastname")||"").trim(),
+          email:     String(fd.get("email")||"").trim(),
+          password:  String(fd.get("password")||"").trim(),
+          phone:     String(fd.get("phone")||"").trim(),
+          adress:    String(fd.get("adress")||"").trim(),
+          zipcode:   String(fd.get("zipcode")||"").trim(),
+          country:   String(fd.get("country")||"").trim(),
+          Ville:     String(fd.get("Ville")||"").trim()
+        }
+        sReg.textContent = "..."
+        try{
+          const r = await fetch(API+"/api/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
+          const j = await r.json().catch(()=>({}))
+          if (!r.ok || !j.ok) { sReg.textContent = j.error || r.statusText; return }
+          saveUser(j.user)
+          location.href = "profil.html"
+        }catch(e){ sReg.textContent = "Erreur réseau" }
+      })
+    })
+  </script>
+</body>
+
+</html>

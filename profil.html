@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DevJobs • Mon Profil</title>
+    <link rel="stylesheet" href="/style/profil.css" />
+  </head>
+  <body>
+    <nav class="nav-bar">
+      <div class="brand">
+        <img src="/img/LogoDevJobs.png" alt="DevJobs" />
+      </div>
+      <a class="menu-link" href="candidat.html">
+        <img class="icone" src="/img/annonces.png" alt="" />
+        <span>Annonces</span>
+      </a>
+      <a class="menu-link actif" href="entreprise1.html">
+        <img class="icone" src="/img/entreprises.png" alt="" />
+        <span>Entreprises</span>
+      </a>
+      <a class="menu-link" href="profil.html">
+        <img class="icone" src="/img/profil.png" alt="" /> <span>Profil</span>
+      </a>
+
+    </nav>
+
+    <main class="profil-layout">
+      <aside class="col gauche">
+        <section class="card identite">
+          <div class="avatar">
+            <div class="avatar-preview" aria-hidden="true"></div>
+            <label class="btn secondaire">
+              Importer une photo
+              <input type="file" accept="image/*" hidden />
+            </label>
+          </div>
+
+          <form class="form-identite" autocomplete="on">
+            <div class="form-group">
+              <label>Intitulé / Titre recherché</label>
+              <input type="text" placeholder="ex : Développeur·se web (alternance)" />
+            </div>
+            <div class="form-group">
+              <label>Localisation</label>
+              <input type="text" placeholder="ex : Ville, Pays" />
+            </div>
+            <div class="actions">
+              <button class="btn primaire" type="submit">Enregistrer</button>
+            </div>
+          </form>
+
+ </section>
+      </aside>
+      
+
+      <section class="col centre">
+        <section class="card section-profil">
+          <h2>Informations personnelles</h2>
+          <form id="form-profil" class="form-profil" autocomplete="on">
+            <div class="ligne">
+              <div class="form-group">
+                <label>Nom de famille</label>
+                <input name="lastname" type="text" placeholder="Votre nom" />
+              </div>
+              <div class="form-group">
+                <label>Prénom</label>
+                <input name="firstname" type="text" placeholder="Votre prénom" />
+              </div>
+            </div>
+
+            <div class="ligne">
+              <div class="form-group">
+                <label>Email</label>
+                <input name="email" type="email" placeholder="votre@email.com" />
+              </div>
+              <div class="form-group">
+                <label>Téléphone</label>
+                <input name="phone" type="tel" placeholder="ex : 06 00 00 00 00" />
+              </div>
+            </div>
+
+            <div class="ligne">
+              <div class="form-group">
+                <label>Adresse</label>
+                <input name="adress" type="text" placeholder="12 rue ..., voie, etc." />
+              </div>
+            </div>
+
+            <div class="ligne">
+              <div class="form-group">
+                <label>Code postal</label>
+                <input name="zipcode" type="text" placeholder="Code postal" />
+              </div>
+              <div class="form-group">
+                <label>Pays</label>
+                <input name="country" type="text" placeholder="Pays" />
+              </div>
+            </div>
+
+            <div class="ligne">
+              <div class="form-group">
+                <label>Ville</label>
+                <input name="Ville" type="text" placeholder="Ville" />
+              </div>
+              <div class="form-group">
+                <label>Mot de passe</label>
+                <input name="password" type="text" placeholder="Mot de passe" />
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn primaire" type="submit">Enregistrer le profil</button>
+              <button type="button" id="btn-delete" class="btn secondaire">Supprimer le compte</button>
+              <button type="button" id="btn-logout" class="btn secondaire">Se déconnecter</button>
+            </div>
+            <p id="profil-status"></p>
+          </form>
+        </section>
+      </section>
+    </main>
+
+    <div class="voile" id="voile"></div>
+    <div class="fenetre" id="fenetre">
+      <header class="fenetre-header">
+        <h3 id="fenetre-titre"></h3>
+        <button class="fermer" id="btn-fermer" aria-label="Fermer">✕</button>
+      </header>
+      <p id="fenetre-texte"></p>
+    </div>
+
+    <script>
+document.addEventListener("DOMContentLoaded", ()=>{
+  const API="http://localhost:3001"
+  const uStr = localStorage.getItem("user")
+  if (!uStr) { location.href = "connexion.html"; return }
+  let user = {}
+  try { user = JSON.parse(uStr) } catch(e) { localStorage.removeItem("user"); location.href="connexion.html"; return }
+
+  const f = document.getElementById("form-profil")
+  const s = document.getElementById("profil-status")
+  const btnDel = document.getElementById("btn-delete")
+  const btnLogout = document.getElementById("btn-logout")
+  const voile = document.getElementById("voile")
+  const fenetre = document.getElementById("fenetre")
+  const titreFen = document.getElementById("fenetre-titre")
+  const texteFen = document.getElementById("fenetre-texte")
+  const btnFermer = document.getElementById("btn-fermer")
+
+  function fill(x){
+    if (!f) return
+    f.querySelector("[name=firstname]").value = x.firstname||""
+    f.querySelector("[name=lastname]").value  = x.lastname||""
+    f.querySelector("[name=email]").value     = x.email||""
+    f.querySelector("[name=phone]").value     = x.phone||""
+    f.querySelector("[name=adress]").value    = x.adress||""
+    f.querySelector("[name=zipcode]").value   = x.zipcode||""
+    f.querySelector("[name=country]").value   = x.country||""
+    f.querySelector("[name=password]").value  = x.password||""
+    f.querySelector("[name=Ville]").value     = x.Ville||""
+  }
+
+  async function refresh(){
+    try{
+      const r = await fetch(API+"/api/me?user_id="+encodeURIComponent(user.user_id))
+      const j = await r.json()
+      if (r.ok && j.ok) {
+        user = j.user
+        localStorage.setItem("user", JSON.stringify(user))
+        fill(user)
+      }
+    }catch(e){}
+  }
+
+  if (f) f.addEventListener("submit", async (e)=>{
+    e.preventDefault()
+    const fd = new FormData(f)
+    const body = {
+      user_id: user.user_id,
+      firstname: String(fd.get("firstname")||"").trim(),
+      lastname:  String(fd.get("lastname")||"").trim(),
+      email:     String(fd.get("email")||"").trim(),
+      phone:     String(fd.get("phone")||"").trim(),
+      adress:    String(fd.get("adress")||"").trim(),
+      zipcode:   String(fd.get("zipcode")||"").trim(),
+      country:   String(fd.get("country")||"").trim(),
+      password:  String(fd.get("password")||"").trim(),
+      Ville:     String(fd.get("Ville")||"").trim()
+    }
+    s && (s.textContent = "...")
+    try{
+      const r = await fetch(API+"/api/me",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
+      const j = await r.json()
+      if (!r.ok || !j.ok) throw 0
+      user = j.user
+      localStorage.setItem("user", JSON.stringify(user))
+      s && (s.textContent = "Modifié")
+    }catch(e){
+      s && (s.textContent = "Erreur")
+    }
+  })
+
+  if (btnDel) btnDel.addEventListener("click", async ()=>{
+    if (!confirm("Supprimer le compte ?")) return
+    try{
+      const r = await fetch(API+"/api/me",{method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({user_id:user.user_id})})
+      const j = await r.json()
+      if (!r.ok || !j.ok) throw 0
+      localStorage.removeItem("user")
+      localStorage.removeItem("user_id")
+      location.href = "connexion.html"
+    }catch(e){
+      alert("Erreur")
+    }
+  })
+
+  if (btnLogout) btnLogout.addEventListener("click", ()=>{
+    localStorage.removeItem("user")
+    localStorage.removeItem("user_id")
+    location.href = "connexion.html"
+  })
+
+  function ouvrirFenetre(t, txt){
+    if (titreFen)  titreFen.textContent = t || ""
+    if (texteFen)  texteFen.textContent = txt || ""
+    if (voile)     voile.style.display = "block"
+    if (fenetre)   fenetre.style.display = "block"
+  }
+  function fermerFenetre(){
+    if (voile)     voile.style.display = "none"
+    if (fenetre)   fenetre.style.display = "none"
+  }
+  if (btnFermer) btnFermer.addEventListener("click", fermerFenetre)
+  if (voile)     voile.addEventListener("click",  fermerFenetre)
+
+  fill(user)
+  refresh()
+})
+</script>
+  </body>
+</html>

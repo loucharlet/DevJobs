@@ -1,0 +1,132 @@
+pour l'admin Lou Charlet : <!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DevJobs - Administrateur</title>
+    <link rel="stylesheet" href="/style/admin.css" />
+  </head>
+  <body>
+ 
+    <aside class="sidebar" aria-label="Navigation admin">
+      <div class="brand">
+        <img
+          src="/img/LogoDevJobs.png"
+          style="max-width: 100%; height: auto"
+        />
+        <div>DevJobs <span>Admin</span></div>
+      </div>
+ 
+      <nav>
+        <a href="#dashboard"><button class="active">Dashboard</button></a>
+        <a href="#jobs"><button>Offres</button></a>
+        <a href="#users"><button>Utilisateurs</button></a>
+        <button id="logout" style="margin-top: 12px">Se déconnecter</button>
+      </nav>
+    </aside>
+ 
+    <main id="content" style="margin-left: 240px; padding: 24px">
+      <section
+        id="dashboard"
+        class="grid cols-3"
+        aria-label="Statistiques globales"
+      >
+        <div class="panel card-kpi">
+          <h3>Utilisateurs inscrits</h3>
+          <div class="value" id="usersCount">0</div>
+        </div>
+        <div class="panel card-kpi">
+          <h3>Annonces publiées</h3>
+          <div class="value" id="jobsCount">0</div>
+        </div>
+        <div class="panel card-kpi">
+          <h3>Entreprises</h3>
+          <div class="value" id="companiesCount">0</div>
+        </div>
+      </section>
+ 
+      <section class="panel" style="margin-top: 16px">
+        <h3 style="margin: 0; color: var(--text)">
+          Nouvelles offres aujourd'hui
+        </h3>
+        <div class="value" id="todayCount">0</div>
+      </section>
+ 
+      <section
+        id="jobs"
+        class="panel"
+        style="margin-top: 24px"
+        aria-label="Gestion des annonces"
+      >
+        <h2 style="margin-top: 0">Gérer les annonces</h2>
+ 
+        <form
+          id="newJobForm"
+          class="grid"
+          style="
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+          "
+        >
+          <input name="title" placeholder="Titre" required />
+          <input name="company" placeholder="Entreprise" required />
+          <input name="location" placeholder="Lieu" />
+          <input name="type" placeholder="Type (CDI, Stage…)" value="CDI" />
+          <button class="primary" type="submit">+ Ajouter</button>
+          <textarea
+            name="description"
+            placeholder="Description"
+            style="grid-column: 1/-1"
+          ></textarea>
+        </form>
+ 
+        <table class="table" aria-label="Tableau des annonces">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Titre</th>
+              <th>Entreprise</th>
+              <th>Lieu</th>
+              <th>Type</th>
+              <th>Créée</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="jobsTableBody"></tbody>
+        </table>
+      </section>
+ 
+      <section
+        id="users"
+        class="panel"
+        style="margin-top: 24px"
+        aria-label="Gestion des utilisateurs"
+      >
+        <h2 style="margin-top: 0">Gérer les utilisateurs</h2>
+        <table class="table" aria-label="Tableau des utilisateurs">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Rôle</th>
+              <th>Actif (ban)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+<tbody id="adsTableBody"></tbody>
+<tbody id="companiesTableBody"></tbody>
+<tbody id="usersTableBody"></tbody>
+
+        </table>
+      </section>
+    </main>
+ 
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+ 
+<script type="module" src="/api/admin.js"></script>
+</body>
+
+  </body>
+</html>

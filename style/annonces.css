@@ -1,0 +1,27 @@
+:root {
+  --background: #aaeaea;
+  --background2: #d4f5ff;
+  --degrade: #d7bbfe;
+  --degrade2: #f7b6fc;
+  --bouton: #8b3dff;
+  --text: #6c5699;
+  --fond: #ffffff;
+  --ombrebord: #2bb7b7;
+}
+ 
+
+body{
+  min-height: 100vh;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: var(--text);
+  background-color: var(--fond);
+  background-image:
+    radial-gradient(circle at top left, var(--background), var(--fond), transparent 90%),
+    radial-gradient(circle at bottom right, var(--degrade), transparent 90%),
+    radial-gradient(circle at bottom, var(--background2), transparent 90%);
+  box-shadow: inset 0 0 20px var(--ombrebord);
+
+  display: grid;
+  place-items: center;      
+}

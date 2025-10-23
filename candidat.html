@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DevJobs • Annonces</title>
+    <link rel="stylesheet" href="/style/stylescandidat.css" />
+  </head>
+  <body>
+    <nav class="nav-bar">
+      <div class="brand">
+        <img src="/img/logodevjobs.png" alt="DevJobs" />
+      </div>
+
+      <a class="menu-link" href="candidat.html">
+        <img class="icone" src="/img/annonces.png" alt="" />
+        <span>Annonces</span>
+      </a>
+      <a class="menu-link actif" href="entreprise1.html">
+        <img class="icone" src="/img/entreprises.png" alt="" />
+        <span>Entreprises</span>
+      </a>
+      <a class="menu-link" href="profil.html">
+        <img class="icone" src="/img/profil.png" alt="" /> <span>Profil</span>
+      </a>
+
+    </nav>
+
+    <main class="contenu">
+      <header class="en-tete">
+        <h1 class="titre-page">Annonces</h1>
+        </div>
+      </header>
+
+      <section class="liste-annonces" id="liste-annonces" aria-live="polite"></section>
+
+      <template id="modele-offre">
+        <article class="carte-offre">
+          <div class="offre-haut">
+            <div class="logo-entreprise"></div>
+            <div class="bloc-titre">
+              <h2 class="poste"></h2>
+              <div class="infos-entreprise"></div>
+              <div class="etiquettes"></div>
+            </div>
+          </div>
+          <div class="offre-bas">
+            <div class="texte-apercu"></div>
+            <button class="btn-voir">En savoir plus</button>
+          </div>
+        </article>
+      </template>
+    </main>
+
+    <div class="voile" id="voile"></div>
+    <div class="fenetre" id="fenetre">
+      <header class="fenetre-header">
+        <h3 id="fenetre-titre"></h3>
+        <button class="fermer" id="btn-fermer" aria-label="Fermer">✕</button>
+      </header>
+      <p id="fenetre-texte"></p>
+    </div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const liste     = document.getElementById("liste-annonces");
+  const modele    = document.getElementById("modele-offre");
+  const voile     = document.getElementById("voile");
+  const fenetre   = document.getElementById("fenetre");
+  const titreFen  = document.getElementById("fenetre-titre");
+  const texteFen  = document.getElementById("fenetre-texte");
+  const btnFermer = document.getElementById("btn-fermer");
+  const API       = "http://localhost:3001";
+
+  function ouvrirFenetre(t, txt){
+    if (titreFen)  titreFen.textContent = t || "Détails de l'annonce";
+    if (texteFen)  texteFen.textContent = txt || "";
+    if (voile)     voile.style.display = "block";
+    if (fenetre)   fenetre.style.display = "block";
+  }
+  function fermerFenetre(){
+    if (voile)     voile.style.display = "none";
+    if (fenetre)   fenetre.style.display = "none";
+  }
+  if (btnFermer) btnFermer.addEventListener("click", fermerFenetre);
+  if (voile)     voile.addEventListener("click",  fermerFenetre);
+
+
+  function splitFullname(fullname=""){
+    const parts = fullname.trim().split(/\s+/);
+    if (parts.length === 0) return { firstname:"", lastname:"" };
+    if (parts.length === 1) return { firstname: parts[0], lastname: "" };
+    return { firstname: parts[0], lastname: parts.slice(1).join(" ") };
+  }
+
+  async function postuler(recruiterId){
+    try{
+      if (!recruiterId) return alert("Aucun Company ID pour cette annonce.");
+
+      const fullname = prompt("Ton nom complet ?");
+      const email    = prompt("Ton email ?");
+      if (!fullname || !email) return alert("Nom et email requis.");
+
+      const { firstname, lastname } = splitFullname(fullname);
+
+      const payload = {
+        recruiter: Number(recruiterId),
+        applier: { firstname, lastname, email }
+      };
+
+      const r = await fetch(API + "/api/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || !j.ok) throw new Error(j?.error || r.statusText || "Erreur API");
+
+      alert("Candidature envoyée ✅");
+      fermerFenetre();
+    } catch (e) {
+      console.error("POST /api/applications", e);
+      alert("Échec de l’envoi ❌ " + (e.message || ""));
+    }
+  }
+
+  function creerCarte(a){
+   
+    const n = modele.content.firstElementChild.cloneNode(true);
+
+    n.dataset.id = a.ad_id ?? "";
+    n.querySelector(".poste").textContent = a.poste || "";
+    const infos = n.querySelector(".infos-entreprise");
+    if (infos) infos.textContent = (a.company_name || "");
+    const ap = n.querySelector(".texte-apercu");
+    if (ap) ap.textContent = a.short_desc || "";
+
+   
+    const btnVoir = n.querySelector(".btn-voir");
+    if (btnVoir) btnVoir.addEventListener("click", () => ouvrirFenetre(a.poste, a.long_desc || ""));
+
+ 
+    const bas = n.querySelector(".offre-bas");
+    if (bas){
+      const b = document.createElement("button");
+      b.className = "btn-postuler";
+      b.textContent = "Postuler";
+
+b.addEventListener("click", () => postuler(a.company_id));
+
+      bas.appendChild(b);
+    }
+
+    return n;
+  }
+
+  async function chargerAnnonces({q=""}={}){
+    try {
+      const u = new URL(API + "/api/ads");
+      if (q) u.searchParams.set("q", q);
+      const r = await fetch(u);
+      const j = await r.json();
+      if (!j.ok) throw 0;
+
+      liste.innerHTML = "";
+      (j.data || []).forEach(a => {
+
+const normalized = {
+  ad_id:        a.ad_id ?? a.id,
+  poste:        a.poste ?? a.title,
+  short_desc:   a.short_desc ?? a.courte ?? "",
+  long_desc:    a.long_desc  ?? a.longue ?? "",
+  company_id:   a.company_id ?? a.company,      
+  company_name: a.company_name ?? a.entreprise ?? "—"
+};
+
+
+        liste.appendChild(creerCarte(normalized));
+      });
+
+      if (!j.data || !j.data.length) {
+        liste.innerHTML = "<p>Aucune annonce.</p>";
+      }
+    } catch (e) {
+      console.error("/api/ads", e);
+      liste.innerHTML = "<p>Erreur de chargement.</p>";
+    }
+  }
+
+  chargerAnnonces(); 
+});
+</script>
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

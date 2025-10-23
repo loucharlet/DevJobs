@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DevJobs • Annonces</title>
+    <link rel="stylesheet" href="/style/entreprise.css" />
+  </head>
+  <body>
+    
+
+<nav class="top-nav">
+  <a href="entreprise1.html" class="actif">Poster une offre</a>
+  <a href="entreprise2.html">Consulter les candidatures reçues</a>
+</nav>
+
+
+
+
+
+
+
+    <nav class="nav-bar">
+      <div class="brand">
+        <img src="/img/LogoDevJobs.png" alt="DevJobs" />
+      </div>
+ 
+ 
+      <a class="menu-link" href="candidat.html">
+        <img class="icone" src="/img/annonces.png" alt="" />
+        <span>Annonces</span>
+      </a>
+      <a class="menu-link actif" href="entreprise1.html">
+        <img class="icone" src="/img/entreprises.png" alt="" />
+        <span>Entreprises</span>
+      </a>
+      <a class="menu-link" href="profil.html">
+        <img class="icone" src="/img/profil.png" alt="" /> <span>Profil</span>
+      </a>
+
+    </nav>
+ 
+    <main class="contenu">
+      <header class="en-tete">
+        <h1 class="titre-page">Poster une offre</h1>
+
+
+        
+      </header>
+
+
+
+<section class="formulaire-offre">
+  <h2>Poster une offre</h2>
+  <form>
+    <div class="form-groupe">
+      <label for="poste">Intitulé du poste</label>
+      <input type="text" id="poste" name="poste" required>
+    </div>
+
+    <div class="form-groupe">
+      <label for="entreprise">Nom de l'entreprise</label>
+      <input type="text" id="entreprise" name="entreprise" required>
+    </div>
+
+    <div class="form-groupe">
+      <label for="lieu">Lieu du poste</label>
+      <input type="text" id="lieu" name="lieu">
+    </div>
+
+    <div class="form-groupe">
+      <label for="contrat">Type de contrat</label>
+      <select id="contrat" name="contrat" required>
+        <option value="">-- Sélectionner --</option>
+        <option>CDI</option>
+        <option>CDD</option>
+        <option>Stage</option>
+        <option>Freelance</option>
+      </select>
+    </div>
+
+    <div class="form-groupe">
+      <label for="salaire">Salaire ou fourchette</label>
+      <input type="text" id="salaire" name="salaire">
+    </div>
+
+    <div class="form-groupe">
+      <label for="description">Description de l'offre</label>
+      <textarea id="description" name="description" rows="5"></textarea>
+    </div>
+
+    <div class="form-groupe">
+      <label for="date-debut">Date de début souhaitée</label>
+      <input type="date" id="date-debut" name="date-debut">
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-principal">Publier l’offre</button>
+    </div>
+  </form>
+</section>
+
+
+
+
+
+
+
+
+
+      <section class="liste-annonces" id="liste-annonces" aria-live="polite"></section>
+
+      <template id="modele-offre">
+        <article class="carte-offre">
+          <div class="offre-haut">
+            <div class="logo-entreprise"></div>
+            <div class="bloc-titre">
+              <h2 class="poste"></h2>
+              <div class="infos-entreprise"></div>
+              <div class="etiquettes"></div>
+            </div>
+          </div>
+          <div class="offre-bas">
+            <div class="texte-apercu"></div>
+            <button class="btn-voir">En savoir plus</button>
+          </div>
+        </article>
+      </template>
+    </main>
+ 
+    <div class="voile" id="voile"></div>
+    <div class="fenetre" id="fenetre">
+      <header class="fenetre-header">
+        <h3 id="fenetre-titre"></h3>
+        <button class="fermer" id="btn-fermer" aria-label="Fermer">✕</button>
+      </header>
+      <p id="fenetre-texte"></p>
+    </div>
+ 
+   <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const API = "http://localhost:3001"
+
+  function v(selList){
+    for (const s of selList){
+      const el = document.querySelector(s)
+      if (el && el.value != null) return el.value
+    }
+    return ""
+  }
+
+  const form = document.querySelector("#form-offre, form")
+  if (!form) return
+
+  async function publier(e){
+    e.preventDefault()
+    const btn = form.querySelector("button[type=submit], button, input[type=submit]")
+    if (btn) btn.disabled = true
+
+    const body = {
+      poste: v(["#poste","[name=poste]","#title","[name=title]"]),
+      entreprise: v(["#entreprise","[name=entreprise]","#company","[name=company]"]),
+      lieu: v(["#lieu","[name=lieu]","#localisation","[name=localisation]"]),
+      contrat: v(["#contrat","[name=contrat]","#contract_type","[name=contract_type]"]),
+      description: v(["#description","[name=description]","#long_desc","[name=long_desc]"])
+    }
+
+    if (!body.poste || !body.entreprise){
+      alert("Remplis au moins le poste et l'entreprise.")
+      if (btn) btn.disabled = false
+      return
+    }
+
+    try{
+      const r = await fetch(API + "/api/ads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      })
+      const j = await r.json()
+      if (!j.ok) throw new Error(j.error || "Erreur")
+      alert("Offre publiée ✅ (ID " + (j.data?.id ?? "?") + ")")
+      form.reset()
+
+      const liste = document.querySelector("#liste-annonces")
+      const tpl = document.querySelector("#modele-offre")
+      if (liste && tpl && tpl.content && tpl.content.firstElementChild){
+        const a = j.data
+        const n = tpl.content.firstElementChild.cloneNode(true)
+        n.dataset.id = a.id || ""
+        n.querySelector(".poste") && (n.querySelector(".poste").textContent = a.poste || "")
+        const infos = n.querySelector(".infos-entreprise")
+        if (infos) infos.textContent = (a.entreprise||"") + (a.lieu? " • "+a.lieu : "") + (a.contrat? " • "+a.contrat : "")
+        n.querySelector(".texte-apercu") && (n.querySelector(".texte-apercu").textContent = a.courte || "")
+        liste.prepend(n)
+      }
+    }catch(e){
+      alert("Échec de publication ❌")
+    }finally{
+      if (btn) btn.disabled = false
+    }
+  }
+
+  form.addEventListener("submit", publier)
+})
+</script>
+
+  </body>
+</html>
